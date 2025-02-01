@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Real-Time Updates</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Google Sheets Real-Time Updates</h1>
+    <table border="1" id="data-table">
+        <thead>
+            <tr>
+                <th>Column A</th>
+                <th>Column B</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const socket = io('http://localhost:3000'); // Ensure this matches backend URL
+    
+        socket.on('connect', () => {
+            console.log('✅ Connected to Socket.io Server');
+        });
+    
+        socket.on('update', (data) => {
+            console.log('📢 Received Update:', data); // Debugging line
+    
+            const tableBody = document.querySelector("#data-table tbody");
+            tableBody.innerHTML = ""; // Clear old data
+    
+            data.forEach(row => {
+                const tr = document.createElement("tr");
+                row.forEach(cell => {
+                    const td = document.createElement("td");
+                    td.textContent = cell;
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+        });
+    
+        socket.on('disconnect', () => {
+            console.log('❌ Disconnected from Server');
+        });
+    </script>
+</body>
+</html>
